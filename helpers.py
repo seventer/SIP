@@ -29,7 +29,7 @@ try:
         import pigpio
         pi = pigpio.pi()
 except ImportError:
-    print 'error importing GPIO pins into helpers'
+#     print 'error importing GPIO pins into helpers'
     pass
 
 try:
@@ -197,16 +197,17 @@ def get_ip():
 
 
 def get_rpi_revision():
+    
     """
     Returns the hardware revision of the Raspberry Pi
     using the RPI_REVISION method from RPi.GPIO.
     """
-    try:
-        import RPi.GPIO as GPIO
-
-        return GPIO.RPI_REVISION
-    except ImportError:
-        return 0
+#     try:
+#         import RPi.GPIO as GPIO
+# 
+#         return GPIO.RPI_REVISION
+#     except ImportError:
+    return 0
 
 def mkdir_p(path):
     try:

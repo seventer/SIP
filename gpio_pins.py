@@ -2,42 +2,54 @@
 
 import gv
 
+# try:
+#     import RPi.GPIO as GPIO
+#     gv.platform = 'pi'
+#     rev = GPIO.RPI_REVISION
+#     if rev == 1:
+#         # map 26 physical pins (1based) with 0 for pins that do not have a gpio number
+#         if gv.use_pigpio:
+#             gv.pin_map = [0,0,0,0,0,1,0,4,14,0,15,17,18,21,0,22,23,0,24,10,0,9,25,11,8,0,7]
+#         else:
+#             gv.pin_map = [0,0,0,0,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26]
+#     elif rev == 2:
+#         # map 26 physical pins (1based) with 0 for pins that do not have a gpio number
+#         if gv.use_pigpio:
+#             gv.pin_map = [0,0,0,2,0,3,0,4,14,0,15,17,18,27,0,22,23,0,24,10,0,9,25,11,8,0,7]
+#         else:
+#             gv.pin_map = [0,0,0,0,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26]
+#     elif rev == 3:
+#         # map 40 physical pins (1based) with 0 for pins that do not have a gpio number
+#         if gv.use_pigpio:
+#             gv.pin_map = [0,0,0,2,0,3,0,4,14,0,15,17,18,27,0,22,23,0,24,10,0,9,25,11,8,0,7,0,0,5,0,6,12,13,0,19,16,26,20,0,21]
+#         else:
+#             gv.pin_map = [0,0,0,3,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26,0,0,29,0,31,32,33,0,35,36,37,38,0,40]
+#     else:
+#         print 'Unknown pi pin revision.  Using pin mapping for rev 3'
+# 
+# except ImportError:
+#     try:
+#         import Adafruit_BBIO.GPIO as GPIO  # Required for accessing General Purpose Input Output pins on Beagle Bone Black
+#         gv.pin_map = [None]*11 # map only the pins we are using
+#         gv.pin_map.extend(['P9_'+str(i) for i in range(11,17)])
+#         gv.platform = 'bo'
+#     except ImportError:
+#         gv.pin_map = [i for i in range(27)] # assume 26 pins all mapped.  Maybe we should not assume anything, but...
+#         gv.platform = ''  # if no platform, allows program to still run.
+#         print 'No GPIO module was loaded from GPIO Pins module'
+
 try:
-    import RPi.GPIO as GPIO
-    gv.platform = 'pi'
-    rev = GPIO.RPI_REVISION
-    if rev == 1:
-        # map 26 physical pins (1based) with 0 for pins that do not have a gpio number
-        if gv.use_pigpio:
-            gv.pin_map = [0,0,0,0,0,1,0,4,14,0,15,17,18,21,0,22,23,0,24,10,0,9,25,11,8,0,7]
-        else:
-            gv.pin_map = [0,0,0,0,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26]
-    elif rev == 2:
-        # map 26 physical pins (1based) with 0 for pins that do not have a gpio number
-        if gv.use_pigpio:
-            gv.pin_map = [0,0,0,2,0,3,0,4,14,0,15,17,18,27,0,22,23,0,24,10,0,9,25,11,8,0,7]
-        else:
-            gv.pin_map = [0,0,0,0,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26]
-    elif rev == 3:
-        # map 40 physical pins (1based) with 0 for pins that do not have a gpio number
-        if gv.use_pigpio:
-            gv.pin_map = [0,0,0,2,0,3,0,4,14,0,15,17,18,27,0,22,23,0,24,10,0,9,25,11,8,0,7,0,0,5,0,6,12,13,0,19,16,26,20,0,21]
-        else:
-            gv.pin_map = [0,0,0,3,0,5,0,7,8,0,10,11,12,13,0,15,16,0,18,19,0,21,22,23,24,0,26,0,0,29,0,31,32,33,0,35,36,37,38,0,40]
-    else:
-        print 'Unknown pi pin revision.  Using pin mapping for rev 3'
-
+#       import the Python GPIO library
+    from pyA20.gpio import gpio
+    from pyA20.gpio import port        
+#         gv.pin_map = [None]*11 # map only the pins we are using
+#         gv.pin_map.extend(['P9_'+str(i) for i in range(11,17)])
+    gv.platform = 'orange'
 except ImportError:
-    try:
-        import Adafruit_BBIO.GPIO as GPIO  # Required for accessing General Purpose Input Output pins on Beagle Bone Black
-        gv.pin_map = [None]*11 # map only the pins we are using
-        gv.pin_map.extend(['P9_'+str(i) for i in range(11,17)])
-        gv.platform = 'bo'
-    except ImportError:
-        gv.pin_map = [i for i in range(27)] # assume 26 pins all mapped.  Maybe we should not assume anything, but...
-        gv.platform = ''  # if no platform, allows program to still run.
-        print 'No GPIO module was loaded from GPIO Pins module'
-
+    gv.pin_map = [i for i in range(27)] # assume 26 pins all mapped.  Maybe we should not assume anything, but...
+    gv.platform = ''  # if no platform, allows program to still run.
+    print 'No GPIO module was loaded from GPIO Pins module'
+        
 from blinker import signal
 zone_change = signal('zone_change')
 
@@ -60,7 +72,10 @@ try:
         GPIO.setmode(GPIO.BOARD)
         pin_rain_sense = gv.pin_map[8]
         pin_relay = gv.pin_map[10]
-    elif gv.platform == 'bo':  # If this will run on Beagle Bone Black:
+#     elif gv.platform == 'bo':  # If this will run on Beagle Bone Black:
+#         pin_rain_sense = gv.pin_map[15]
+#         pin_relay = gv.pin_map[16]
+    elif gv.platform == 'orange':  # If this will run on Orange Pi:
         pin_rain_sense = gv.pin_map[15]
         pin_relay = gv.pin_map[16]
 except AttributeError:
@@ -101,29 +116,44 @@ def setup_pins():
             pin_sr_clk = gv.pin_map[13]
             pin_sr_noe = gv.pin_map[14]
             pin_sr_lat = gv.pin_map[12]
+        elif gv.platform == 'orange':  # If this will run on Orange Pi:
+            gpio.init()
+            pin_sr_dat = port.PA0 #  gv.pin_map[13]
+            pin_sr_clk = port.PA6 #  gv.pin_map[7]
+            pin_sr_noe = port.PA1 #  gv.pin_map[11]
+            pin_sr_lat = port.PA3 #  gv.pin_map[15]
     except AttributeError:
         pass
 
     #### setup GPIO pins as output or input ####
     try:
-        if gv.use_pigpio:
-            pi.set_mode(pin_sr_noe, pigpio.OUTPUT)
-            pi.set_mode(pin_sr_clk, pigpio.OUTPUT)
-            pi.set_mode(pin_sr_dat, pigpio.OUTPUT)
-            pi.set_mode(pin_sr_lat, pigpio.OUTPUT)
-            pi.write(pin_sr_noe, 1)
-            pi.write(pin_sr_clk, 0)
-            pi.write(pin_sr_dat, 0)
-            pi.write(pin_sr_lat, 0)
-        else:
-            GPIO.setup(pin_sr_noe, GPIO.OUT)
-            GPIO.setup(pin_sr_clk, GPIO.OUT)
-            GPIO.setup(pin_sr_dat, GPIO.OUT)
-            GPIO.setup(pin_sr_lat, GPIO.OUT)
-            GPIO.output(pin_sr_noe, GPIO.HIGH)
-            GPIO.output(pin_sr_clk, GPIO.LOW)
-            GPIO.output(pin_sr_dat, GPIO.LOW)
-            GPIO.output(pin_sr_lat, GPIO.LOW)
+#         if gv.use_pigpio:
+#             pi.set_mode(pin_sr_noe, pigpio.OUTPUT)
+#             pi.set_mode(pin_sr_clk, pigpio.OUTPUT)
+#             pi.set_mode(pin_sr_dat, pigpio.OUTPUT)
+#             pi.set_mode(pin_sr_lat, pigpio.OUTPUT)
+#             pi.write(pin_sr_noe, 1)
+#             pi.write(pin_sr_clk, 0)
+#             pi.write(pin_sr_dat, 0)
+#             pi.write(pin_sr_lat, 0)
+#         else:
+#             GPIO.setup(pin_sr_noe, GPIO.OUT)
+#             GPIO.setup(pin_sr_clk, GPIO.OUT)
+#             GPIO.setup(pin_sr_dat, GPIO.OUT)
+#             GPIO.setup(pin_sr_lat, GPIO.OUT)
+#             GPIO.output(pin_sr_noe, GPIO.HIGH)
+#             GPIO.output(pin_sr_clk, GPIO.LOW)
+#             GPIO.output(pin_sr_dat, GPIO.LOW)
+#             GPIO.output(pin_sr_lat, GPIO.LOW)
+
+        gpio.setcfg(pin_sr_noe, gpio.OUT)
+        gpio.setcfg(pin_sr_clk, gpio.OUT)
+        gpio.setcfg(pin_sr_dat, gpio.OUT)
+        gpio.setcfg(pin_sr_lat, gpio.OUT)
+        gpio.output(pin_sr_noe, gpio.HIGH)
+        gpio.output(pin_sr_clk, gpio.LOW)
+        gpio.output(pin_sr_dat, gpio.LOW)
+        gpio.output(pin_sr_lat, gpio.LOW)
     except NameError:
         pass
 
@@ -141,7 +171,7 @@ def disableShiftRegisterOutput():
         if gv.use_pigpio:
             pi.write(pin_sr_noe, 1)
         else:
-            GPIO.output(pin_sr_noe, GPIO.HIGH)
+            gpio.output(pin_sr_noe, gpio.HIGH)
     except Exception:
         pass
 
@@ -154,7 +184,7 @@ def enableShiftRegisterOutput():
         if gv.use_pigpio:
             pi.write(pin_sr_noe, 0)
         else:
-            GPIO.output(pin_sr_noe, GPIO.LOW)
+            gpio.output(pin_sr_noe, gpio.LOW)
     except Exception:
         pass
 
@@ -176,16 +206,16 @@ def setShiftRegister(srvals):
                 pi.write(pin_sr_clk, 1)
             pi.write(pin_sr_lat, 1)
         else:
-            GPIO.output(pin_sr_clk, GPIO.LOW)
-            GPIO.output(pin_sr_lat, GPIO.LOW)
+            gpio.output(pin_sr_clk, gpio.LOW)
+            gpio.output(pin_sr_lat, gpio.LOW)
             for s in range(gv.sd['nst']):
-                GPIO.output(pin_sr_clk, GPIO.LOW)
+                gpio.output(pin_sr_clk, gpio.LOW)
                 if srvals[gv.sd['nst']-1-s]:
                     GPIO.output(pin_sr_dat, GPIO.HIGH)
                 else:
-                    GPIO.output(pin_sr_dat, GPIO.LOW)
-                GPIO.output(pin_sr_clk, GPIO.HIGH)
-            GPIO.output(pin_sr_lat, GPIO.HIGH)
+                    gpio.output(pin_sr_dat, gpio.LOW)
+                gpio.output(pin_sr_clk, gpio.HIGH)
+            gpio.output(pin_sr_lat, gpio.HIGH)
     except Exception:
         pass
 
