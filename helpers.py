@@ -159,7 +159,7 @@ def restart(wait=1, block=False):
         except Exception:
             pass
         gv.restarted = 0
-        subprocess.Popen('service sip restart'.split())
+        subprocess.Popen('systemctl restart sip.service'.split())
     else:
         t = Thread(target=restart, args=(wait, True))
         t.start()
@@ -346,7 +346,9 @@ def log_run():
         duration = _('duration')
         strt = _('start')
         date = _('date')
-        if gv.lrun[1] == 98:
+        if gv.lrun[1] == 0:  # skip program 0
+            return
+        elif gv.lrun[1] == 98:
             pgr = _('Run-once')
         elif gv.lrun[1] == 99:
             pgr = _('Manual')

@@ -122,6 +122,7 @@ def setup_pins():
             pin_sr_clk = port.PA6 #  gv.pin_map[7]
             pin_sr_noe = port.PA1 #  gv.pin_map[11]
             pin_sr_lat = port.PA3 #  gv.pin_map[15]
+
     except AttributeError:
         pass
 
@@ -221,10 +222,15 @@ def setShiftRegister(srvals):
 
 
 def set_output():
-    """Activate triacs according to shift register state."""
+    """
+    Activate triacs according to shift register state.
+    If using SIP with shift registers and active low relays, uncomment the line indicated below.
+    """
 
     with gv.output_srvals_lock:
         gv.output_srvals = gv.srvals
+        if gv.sd['alr']:
+            gv.output_srvals = [1-i for i in gv.output_srvals] #  invert logic of shift registers    
         disableShiftRegisterOutput()
         setShiftRegister(gv.output_srvals)  # gv.srvals stores shift register state
         enableShiftRegisterOutput()
