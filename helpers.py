@@ -45,6 +45,13 @@ except ImportError:
 ##############################
 #### Function Definitions ####
 
+sip_heartbeat = signal('sip_heartbeat')
+def report_sip_heartbeat(txt=None):
+    """
+    Send blinker signal indicating that a heartbeat has occurred.
+    """
+    sip_heartbeat.send()
+
 station_completed = signal('station_completed')
 def report_station_completed(station):
     """

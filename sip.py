@@ -44,6 +44,7 @@ def timing_loop():
     except Exception:
         pass
     last_min = 0
+    beat_min = 0
     while True:  # infinite loop
         gv.nowt = time.localtime()   # Current time as time struct.  Updated once per second.
         gv.now = timegm(gv.nowt)   # Current time as timestamp based on local time from the Pi. Updated once per second.
@@ -188,6 +189,10 @@ def timing_loop():
             gv.sd['rd'] = 0
             gv.sd['rdst'] = 0  # Rain delay stop time
             jsave(gv.sd, 'sd')        
+        
+        if gv.now > beat_min:  # Check if minute is passed to signal a heartbeat
+            beat_min = gv.now + 60
+            report_sip_heartbeat() # send a heartbeat signal once a minute
 
         time.sleep(1)
         #### End of timing loop ####
